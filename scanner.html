@@ -60,27 +60,26 @@
     const resultElement = document.getElementById('qr-result');
     const qrReaderId = "qr-reader";
 
-    // 檢查是否有可用的相機
     Html5Qrcode.getCameras().then(devices => {
         if (devices && devices.length) {
-            // 找到相機
+
             resultElement.innerHTML = `<b>相機狀態:</b> 找到 ${devices.length} 個相機。正在嘗試啟動...`;
 
-            // 選取後置鏡頭 (facingMode: "environment") 或第一個偵測到的相機 ID
-            //let cameraId = devices.find(device => device.label.toLowerCase().includes('back'))
-            //               ? { facingMode: "environment" } // 嘗試使用後置
-            //               : devices[0].id; // 否則使用第一個相機的 ID
+            let cameraConfig;
 
-            // 【新的強制選擇邏輯】
-            // 強制使用 devices 列表中的第一個相機 ID 進行啟動
-            let cameraId = devices[2].id;
+            if (devices.length === 1) {
+                // 只有一個相機（iPhone 常見）
+                cameraConfig = { facingMode: "environment" };
+            } else {
+                // 多相機（Android）
+                cameraConfig = devices[0].deviceId;  // 改用 deviceId
+            }
 
             const html5QrCode = new Html5Qrcode(qrReaderId);
-            
-            const config = { 
-                fps: 10, 
+
+            const config = {
+                fps: 10,
                 qrbox: { width: 250, height: 250 },
-                // 減少格式數量，有時可提高初始化速度
                 formatsToSupport: [
                     Html5QrcodeSupportedFormats.QR_CODE,
                     Html5QrcodeSupportedFormats.EAN_13
@@ -88,44 +87,19 @@
             };
 
             html5QrCode.start(
-                cameraId, // 傳入選取的相機 ID 或 facingMode
-                config, 
+                cameraConfig,
+                config,
                 (decodedText, decodedResult) => {
-                    // 掃描成功處理...
-                    resultElement.innerHTML = `<b>✅ 掃描成功結果:</b> ${decodedText}<br><b>條碼類型:</b> ${decodedResult.result.format.formatName}`;
+                    resultElement.innerHTML = `<b>掃描成功:</b> ${decodedText}`;
                     html5QrCode.stop();
-                },
-                (errorMessage) => { /* 掃描過程中的錯誤，通常忽略 */ }
+                }
             ).catch(err => {
-                // 啟動失敗
-                resultElement.innerHTML = `
-                    <b>❌ 啟動相機失敗:</b> ${err}
-                    <br>
-                    <span style="color:red;">請檢查手機相機權限和設備是否支援。</span>
-                `;
-                resultElement.style.backgroundColor = '#fff2f0';
-                resultElement.style.borderColor = '#ff4d4f';
+                resultElement.innerHTML = `<b>❌ 相機啟動失敗:</b> ${err}`;
             });
-
-        } else {
-            // 未找到任何相機
-            resultElement.innerHTML = '<b>❌ 錯誤:</b> 在此設備上未偵測到任何可用的相機。';
         }
-    }).catch(err => {
-        // 獲取相機列表時失敗 (通常是因為權限被拒絕或 API 不支援)
-        resultElement.innerHTML = `
-            <b>❌ 致命錯誤:</b> 無法存取相機設備。錯誤代碼: ${err.name}
-            <br>
-            <span style="color:red;">請確認瀏覽器已授予相機權限。</span>
-        `;
-        resultElement.style.backgroundColor = '#fff2f0';
-        resultElement.style.borderColor = '#ff4d4f';
     });
+
 </script>
 
 </body>
-
 </html>
-
-
-
