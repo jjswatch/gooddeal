@@ -1,105 +1,25 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTML 網頁條碼/QR Code 掃描器</title>
-    
-    <script src="https://unpkg.com/html5-qrcode"></script>
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            text-align: center;
-            background-color: #f4f7f9;
+<html>
+  <head>
+    <title>Instascan</title>
+    <script type="text/javascript" src="js/instascan.min.js"></script>
+  </head>
+  <body>
+    <video id="preview"></video>
+    <script type="text/javascript">
+      let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+      scanner.addListener('scan', function (content) {
+        console.log(content);
+      });
+      Instascan.Camera.getCameras().then(function (cameras) {
+        if (cameras.length > 0) {
+          scanner.start(cameras[0]);
+        } else {
+          console.error('No cameras found.');
         }
-        .container {
-            max-width: 600px;
-            margin: auto;
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        #qr-reader {
-            width: 100%;
-            border: 2px solid #ccc;
-            border-radius: 4px;
-            margin-bottom: 20px;
-        }
-        #qr-result {
-            margin-top: 20px;
-            padding: 15px;
-            min-height: 50px;
-            background-color: #e6f7ff;
-            border: 1px solid #91d5ff;
-            border-radius: 4px;
-            text-align: left;
-        }
-        #qr-result b {
-            font-weight: bold;
-            color: #0050b3;
-        }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <h2>📸 網頁條碼掃描器 (HTML/JS)</h2>
-    <p>請點擊下方的「啟動掃描」按鈕，並授予瀏覽器相機使用權限。</p>
-
-    <div id="qr-reader"></div>
-
-    <div id="qr-result">
-        <b>狀態:</b> 等待啟動...
-    </div>
-</div>
-
-<script>
-    const resultElement = document.getElementById('qr-result');
-    const qrReaderId = "qr-reader";
-
-    Html5Qrcode.getCameras().then(devices => {
-        if (devices && devices.length) {
-
-            resultElement.innerHTML = `<b>相機狀態:</b> 找到 ${devices.length} 個相機。正在嘗試啟動...`;
-
-            let cameraConfig;
-
-            if (devices.length === 1) {
-                // 只有一個相機（iPhone 常見）
-                cameraConfig = { facingMode: "environment" };
-            } else {
-                // 多相機（Android）
-                cameraConfig = devices[0].deviceId;  // 改用 deviceId
-            }
-
-            const html5QrCode = new Html5Qrcode(qrReaderId);
-
-            const config = {
-                fps: 10,
-                qrbox: { width: 250, height: 250 },
-                formatsToSupport: [
-                    Html5QrcodeSupportedFormats.QR_CODE,
-                    Html5QrcodeSupportedFormats.EAN_13
-                ]
-            };
-
-            html5QrCode.start(
-                cameraConfig,
-                config,
-                (decodedText, decodedResult) => {
-                    resultElement.innerHTML = `<b>掃描成功:</b> ${decodedText}`;
-                    html5QrCode.stop();
-                }
-            ).catch(err => {
-                resultElement.innerHTML = `<b>❌ 相機啟動失敗:</b> ${err}`;
-            });
-        }
-    });
-
-</script>
-
-</body>
+      }).catch(function (e) {
+        console.error(e);
+      });
+    </script>
+  </body>
 </html>
