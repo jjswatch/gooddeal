@@ -67,9 +67,13 @@
             resultElement.innerHTML = `<b>相機狀態:</b> 找到 ${devices.length} 個相機。正在嘗試啟動...`;
 
             // 選取後置鏡頭 (facingMode: "environment") 或第一個偵測到的相機 ID
-            let cameraId = devices.find(device => device.label.toLowerCase().includes('back'))
-                           ? { facingMode: "environment" } // 嘗試使用後置
-                           : devices[0].id; // 否則使用第一個相機的 ID
+            //let cameraId = devices.find(device => device.label.toLowerCase().includes('back'))
+            //               ? { facingMode: "environment" } // 嘗試使用後置
+            //               : devices[0].id; // 否則使用第一個相機的 ID
+
+            // 【新的強制選擇邏輯】
+            // 強制使用 devices 列表中的第一個相機 ID 進行啟動
+            let cameraId = devices[0].id;
 
             const html5QrCode = new Html5Qrcode(qrReaderId);
             
@@ -122,3 +126,4 @@
 </body>
 
 </html>
+
