@@ -257,14 +257,11 @@ footer {
 </head>
 
 <body>
-
 	<!-- 導覽列 -->
 	<nav>
 		<div class="nav-container">
-			<div class="logo">Good Deal</div>
-
+			<div class="logo">GoodDeal</div>
 			<div class="hamburger" onclick="toggleMenu()">☰</div>
-
 			<ul class="nav-links" id="navMenu">
 				<li><a href="index.html">首頁</a></li>
 				<li><a href="#hot">熱門商品</a></li>
@@ -277,20 +274,14 @@ footer {
 	<section class="hero">
 		<h1>快速找到最便宜的商品價格</h1>
 		<p>整合全台主要量販店，每日更新價格資訊，幫你省時又省錢。</p>
-
 		<div class="search-box">
 			<input id="keyword" type="text" placeholder="輸入商品名稱">
-			<button onclick="openScanner()">📷 掃碼</button>
 			<button onclick="goSearch()">搜尋</button>
+			<button onclick="goBarcode()">條碼</button>
 		</div>
 	</section>
 
-	<div id="scanner" style="display: none; padding: 20px;">
-		<div id="qr-reader" style="width: 300px; margin: auto;"></div>
-		<button onclick="closeScanner()">關閉</button>
-	</div>
-
-
+	<!--
 	<section class="features">
 		<div class="card">
 			<h3>🔍 即時搜尋</h3>
@@ -307,12 +298,12 @@ footer {
 			<p>追蹤價格變化，不錯過降價時機。</p>
 		</div>
 	</section>
+	-->
 
-	<h2 class="section-title">🏬 店家搜尋</h2>
+	<!-- <h2 class="section-title">🏬 店家搜尋</h2> -->
 	<section style="padding: 20px; max-width: 1100px; margin: auto;">
 		<div id="store-cards" class="store-card-container"></div>
 	</section>
-
 
 	<!-- 分類標籤區 -->
 	<h2 class="section-title">🏬 分類搜尋</h2>
@@ -426,60 +417,9 @@ function goStore(storeId) {
 // 初始化
 loadStores();
 
-//掃碼視窗開啟
-async function openScanner() {
-  const scannerEl = document.getElementById("barcode-scanner");
-  scannerEl.style.display = "flex";
-
-  // 建立掃描器
-  const html5QrCode = new Html5Qrcode("qr-reader");
-
-  // 使用後鏡頭（facingMode: environment）掃描
-  html5QrCode.start(
-    { facingMode: "environment" },
-    { fps: 10, qrbox: 250 },   // 可調整 fps 或 qrbox 尺寸
-    (decodedText, decodedResult) => {
-      // 掃到字串後，將條碼放入搜尋框，並立即停止掃描與關閉視窗
-      document.getElementById("keyword").value = decodedText;
-
-      html5QrCode.stop().then(() => {
-        // 停止相機
-        scannerEl.style.display = "none";
-        goSearch();  // 直接跳轉到搜尋頁
-      }).catch(err => {
-        console.warn("停止掃描失敗:", err);
-        scannerEl.style.display = "none";
-      });
-    },
-    errorMessage => {
-      // 可以在這裡顯示掃描過程中的錯誤或提示，但通常可忽略
-      // console.log("掃描中錯誤: ", errorMessage);
-    }
-  ).catch(err => {
-    console.error("相機啟動失敗:", err);
-    alert("無法啟動相機掃描，請確認是否允許使用相機。");
-    scannerEl.style.display = "none";
-  });
-}
-
-// 關閉掃描視窗
-function closeScanner() {
-  // 重新載入或強制關閉視窗即可，這裡選擇重新載入整頁簡單處理
-  location.reload();
+function goBarcode() {
+    window.location.href = "barcode_scanner_1d.html";
 }
 </script>
-	<!-- 條碼掃描視窗，預設隱藏 -->
-	<div id="barcode-scanner"
-		style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); z-index: 9999; align-items: center; justify-content: center;">
-		<div
-			style="position: relative; width: 100%; max-width: 360px; margin: auto; padding: 20px; background: #fff; border-radius: 12px; text-align: center;">
-			<div id="qr-reader" style="width: 100%;"></div>
-			<button onclick="closeScanner()"
-				style="margin-top: 12px; padding: 8px 16px; border: none; background: #333; color: #fff; border-radius: 8px;">關閉</button>
-		</div>
-	</div>
-
-	<!-- 引入條碼掃描庫 -->
-	<script src="https://unpkg.com/html5-qrcode"></script>
 </body>
 </html>
